@@ -51,10 +51,34 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '仪表盘', icon: 'dashboard' }
     }]
   },
-
+  {
+    path: '/article',
+    component: Layout,
+    redirect: '/article/articleList',
+    name: '/Article',
+    meta: { title: '文章管理', icon: 'el-icon-collection' },
+    children: [{
+      path: 'articleList',
+      name: 'ArticleList',
+      component: () => import('@/views/article/articleList/index'),
+      meta: { title: '文章列表', icon: 'el-icon-notebook-2' }
+    },
+    {
+      path: 'articleCategory',
+      name: 'ArticleCategory',
+      component: () => import('@/views/article/articleCategory/index'),
+      meta: { title: '文章分类', icon: 'el-icon-notebook-1' }
+    },
+    {
+      path: 'articleAdd',
+      name: 'ArticleAdd',
+      component: () => import('@/views/article/articleAdd/index'),
+      meta: { title: '文章编撰', icon: 'el-icon-edit-outline' }
+    }]
+  },
   {
     path: '/example',
     component: Layout,
@@ -173,7 +197,7 @@ const createRouter = () => new Router({
 const router = createRouter()
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
-export function resetRouter() {
+export function resetRouter () {
   const newRouter = createRouter()
   router.matcher = newRouter.matcher // reset router
 }
