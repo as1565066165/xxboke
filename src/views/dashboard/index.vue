@@ -10,7 +10,7 @@
               <p>您好，欢迎访问星选博客</p>
             </div>
           </div>
-          <div class="box-bottom">本次登录地点：{{ returnCitySN.cname }}</div>
+          <div class="box-bottom">本次登录地点：{{ address }}</div>
         </el-card>
       </div>
       <div class="el-row el-col-16 el-col-xs-24 el-col-sm-24 el-col-md-15 el-col-lg-16 el-col-xl-16">
@@ -41,49 +41,41 @@
 <script>
 import { mapGetters } from 'vuex'
 import * as echarts from 'echarts'
+import dashboardApi from '@/api/dashboard'
+import { keysMappingReverse } from '@/utils/keysMapping'
 export default {
   name: 'Dashboard',
   data () {
     return {
-      returnCitySN,
-      websiteRecordData: [{
-        title: '今日新增用户',
-        icon: 'el-icon-user',
-        total: 100
-      }, {
-        title: '今日浏览量',
-        icon: 'el-icon-view',
-        total: 100
-      }, {
-        title: '今日新增文章',
-        icon: 'el-icon-collection',
-        total: 100
-      }, {
-        title: '今日新增评论',
-        icon: 'el-icon-s-comment',
-        total: 100
-      }, {
-        title: '用户总数',
-        icon: 'el-icon-user',
-        total: 100
-      }, {
-        title: '浏览量总数',
-        icon: 'el-icon-view',
-        total: 100
-      }, {
-        title: '文章总数',
-        icon: 'el-icon-collection',
-        total: 100
-      }, {
-        title: '评论总数',
-        icon: 'el-icon-s-comment',
-        total: 100
+      // 登录地点
+      address: '',
+      // 网站数据
+      websiteRecordData: [],
+      // 流量量数据
+      source: [],
+      // 转换规则
+      mapping: {
+        'product': 'date',
+        '登录次数': 'loginCount',
+        '浏览量': 'viewCount',
+        '注册用户': 'registerCount'
       }
-      ]
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'name'
+    ])
+  },
+  watch: {
+    source () {
+      this.initBarChart()
     }
   },
   mounted () {
-    this.initBarChart()
+    this.getAddressByIp()
+    this.getWebsiteRecordData()
+    this.getWebsitePageViews()
   },
   methods: {
     // 初始化柱状图
@@ -94,12 +86,7 @@ export default {
         tooltip: {},
         dataset: {
           dimensions: ['product', '登录次数', '浏览量', '注册用户'],
-          source: [
-            { product: '11-21', '登录次数': 70, '浏览量': 85, '注册用户': 93 },
-            { product: '11-22', '登录次数': 83, '浏览量': 73, '注册用户': 55 },
-            { product: '11-23', '登录次数': 86, '浏览量': 65, '注册用户': 82 },
-            { product: '11-24', '登录次数': 72, '浏览量': 53, '注册用户': 39 }
-          ]
+          source: this.source
         },
         // 这一行是干货grid就代表网格线。只要把宽高设置成百分比就可以了，位置可以通过y值y2值x值和x2值调试。
         grid: { show: 'true', borderWidth: '0', height: '60%', width: '80%', y: '20%', x: '12%' },
@@ -141,14 +128,37 @@ export default {
           break
       }
       return color
+    },
+    // 根据ip地址获取位置信息和运营商
+    async getAddressByIp () {
+      const res = await dashboardApi.getAddress()
+      console.log(res)
+      this.address = res.data.address
+    },
+    // 获取网站信息
+    async getWebsiteRecordData () {
+      const res = await dashboardApi.getWebsiteRecordData()
+      if (res.code === 20000) {
+        this.websiteRecordData = res.data
+      } else {
+        this.$message.error('网站信息获取失败！')
+      }
+    },
+    // 获取近一周每日来访统计数据
+    async getWebsitePageViews () {
+      const res = await dashboardApi.getWebsitePageViews()
+      if (res.code === 20000) {
+        res.data.forEach(item => {
+          item.date = item.date.split(' ')[0]
+        })
+        const data = keysMappingReverse(res.data, this.mapping, true)
+        this.source = data
+      } else {
+        this.$message.error('每日来访统计数据获取失败！')
+      }
     }
-
-  },
-  computed: {
-    ...mapGetters([
-      'name'
-    ])
   }
+
 }
 </script>
 

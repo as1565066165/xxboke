@@ -44,7 +44,7 @@
           <el-table-column prop="createdTime" label="创建时间" width="150" show-overflow-tooltip />
           <el-table-column label="操作" fixed="right" width="100">
             <template v-slot="{row}">
-              <el-button type="text">编辑</el-button>
+              <el-button type="text" @click="goActicleEditPage(row.id)">编辑</el-button>
               <el-button type="text">删除</el-button>
             </template>
           </el-table-column>
@@ -80,66 +80,68 @@ export default {
       // 表格数据
       tableData: [
         {
+          id: 1,
           userName: 'luoxu',
           title: '最美女主——艾薇莉特',
           status: '1',
           createdTime: '2020-8-28 08:25:36'
         },
         {
+          id: 1,
           userName: 'luoxu',
           title: '最美女主——艾薇莉特',
           status: '1',
           createdTime: '2020-8-28 08:25:36'
-        },
-        {
+        }, {
+          id: 1,
           userName: 'luoxu',
           title: '最美女主——艾薇莉特',
           status: '1',
           createdTime: '2020-8-28 08:25:36'
-        },
-        {
+        }, {
+          id: 1,
           userName: 'luoxu',
           title: '最美女主——艾薇莉特',
           status: '1',
           createdTime: '2020-8-28 08:25:36'
-        },
-        {
+        }, {
+          id: 1,
           userName: 'luoxu',
           title: '最美女主——艾薇莉特',
           status: '1',
           createdTime: '2020-8-28 08:25:36'
-        },
-        {
+        }, {
+          id: 1,
           userName: 'luoxu',
           title: '最美女主——艾薇莉特',
           status: '1',
           createdTime: '2020-8-28 08:25:36'
-        },
-        {
+        }, {
+          id: 1,
           userName: 'luoxu',
           title: '最美女主——艾薇莉特',
           status: '1',
           createdTime: '2020-8-28 08:25:36'
-        },
-        {
+        }, {
+          id: 1,
           userName: 'luoxu',
           title: '最美女主——艾薇莉特',
           status: '1',
           createdTime: '2020-8-28 08:25:36'
-        },
-        {
+        }, {
+          id: 1,
           userName: 'luoxu',
           title: '最美女主——艾薇莉特',
           status: '1',
           createdTime: '2020-8-28 08:25:36'
-        },
-        {
+        }, {
+          id: 1,
           userName: 'luoxu',
           title: '最美女主——艾薇莉特',
           status: '1',
           createdTime: '2020-8-28 08:25:36'
-        },
-        {
+        }, {
+          id: 1,
           userName: 'luoxu',
           title: '最美女主——艾薇莉特',
           status: '1',
@@ -184,6 +186,10 @@ export default {
     // 当点击了新增文章按钮 触发事件
     goAddArticlePage () {
       this.$router.push('/article/articleAdd')
+    },
+    // 当点击了编辑按钮 触发事件
+    goActicleEditPage (id) {
+      this.$router.push(`/article/articleAdd?articleId=${id}`)
     }
   }
 }
