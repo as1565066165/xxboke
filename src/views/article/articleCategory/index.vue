@@ -181,21 +181,36 @@ export default {
     },
     // 删除分类数据
     deleteCategory (id) {
-      if (Array.isArray(id)) {
-        for (let i = 0; i < id.length; i++) {
+      this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        if (Array.isArray(id)) {
+          for (let i = 0; i < id.length; i++) {
+            this.categoryTableData.some((item, index) => {
+              if (item.id === id[i]) {
+                this.categoryTableData.splice(index, 1)
+              }
+            })
+          }
+        } else {
           this.categoryTableData.some((item, index) => {
-            if (item.id === id[i]) {
+            if (item.id === id) {
               this.categoryTableData.splice(index, 1)
             }
           })
         }
-      } else {
-        this.categoryTableData.some((item, index) => {
-          if (item.id === id) {
-            this.categoryTableData.splice(index, 1)
-          }
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
         })
-      }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     }
   }
 }

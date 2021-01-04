@@ -1,6 +1,20 @@
 const Mock = require('mockjs')
 // const axios = require('axios')
 // const result = (async function () { return await axios.get('https://www.ip.cn/api/index?ip=218.104.155.137&type=0') })()
+const data = Mock.mock({
+  'data|8': [{
+    'index|+1': 0,
+    'title|+1': ['今日新增用户', '今日浏览量', '今日新增文章', '今日新增评论', '用户总数', '浏览量总数', '文章总数', '评论总数'],
+    'icon|+1': ['el-icon-user', 'el-icon-view', 'el-icon-collection', 'el-icon-s-comment', 'el-icon-user', 'el-icon-view', 'el-icon-collection', 'el-icon-s-comment'],
+    total: function () {
+      if (this.index >= 4) {
+        return parseInt(Math.random() * 10000)
+      } else {
+        return parseInt(Math.random() * 300)
+      }
+    }
+  }]
+})
 
 module.exports = [
   {
@@ -24,14 +38,11 @@ module.exports = [
     url: '/dashboard/getWebsiteRecordData',
     type: 'get',
     response: config => {
-      return Mock.mock({
+      const result = data.data
+      return {
         code: 20000,
-        'data|8': [{
-          'title|+1': ['今日新增用户', '今日浏览量', '今日新增文章', '今日新增评论', '用户总数', '浏览量总数', '文章总数', '评论总数'],
-          'icon|+1': ['el-icon-user', 'el-icon-view', 'el-icon-collection', 'el-icon-s-comment', 'el-icon-user', 'el-icon-view', 'el-icon-collection', 'el-icon-s-comment'],
-          total: '@integer(50,300)'
-        }]
-      })
+        data: result
+      }
     }
   },
   {
