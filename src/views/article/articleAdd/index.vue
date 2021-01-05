@@ -20,7 +20,13 @@
           <div class="article-category">
             <label>分类</label>
             <el-select v-model="articleForm.categoryId" placeholder="请选择" style="width:100%">
-              <el-option v-for="item in categoryOptions" :key="item.value" :label="item.label" :value="item.value" />
+              <el-option v-for="item in categoryOptions" :key="item.id" :label="item.name" :value="item.id" />
+            </el-select>
+          </div>
+          <div class="article-status">
+            <label>状态</label>
+            <el-select v-model="articleForm.status" size="medium" placeholder="请选择" style="width:100%">
+              <el-option v-for="item in articleStatusList" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </div>
           <div class="article-photo">
@@ -34,13 +40,6 @@
           <div class="article-tag">
             <label>标签</label>
             <el-tree :data="tagsList" show-checkbox node-key="id" default-expand-all :props="defaultProps" highlight-current @check="checkHandle" />
-          </div>
-          <div class="article-status">
-            <el-button-group>
-              <label>状态</label>
-              <el-button size="small" @click="articleForm.status=1">发布</el-button>
-              <el-button size="small" @click="articleForm.status=0">草稿</el-button>
-            </el-button-group>
           </div>
         </div>
       </div>
@@ -56,6 +55,7 @@
 
 <script>
 import myEditor from './components/myEditor.vue'
+import acticleApi from '@/api/acticle'
 export default {
   components: {
     myEditor
@@ -75,8 +75,10 @@ export default {
         // 封面图片id
         uid: '',
         // 文章状态
-        status: 0
+        status: ''
       },
+      // 文章状态列表
+      articleStatusList: [],
       // 文件列表
       fileList: [],
       // 标签列表
@@ -121,31 +123,48 @@ export default {
         label: 'label'
       },
       // 文章分类
-      categoryOptions: [
-        {
-          value: '1',
-          label: '科技'
-        },
-        {
-          value: '2',
-          label: '学术'
-        },
-        {
-          value: '3',
-          label: '服装'
-        },
-        {
-          value: '4',
-          label: '美食'
-        },
-        {
-          value: '5',
-          label: '自然'
-        }
-      ]
+      categoryOptions: []
     }
   },
+  created () {
+    const id = this.$route.query.articleId
+    if (id) {
+      this.queryActicleDataById(id)
+    }
+    // 获取分类列表
+    this.getCategoryData()
+    // 获取文章状态列表
+    this.getArticleStatusList()
+  },
   methods: {
+    // 获取分类表格数据
+    async getCategoryData () {
+      const res = await acticleApi.getCategoryTableData()
+      if (res.code === 20000) {
+        this.categoryOptions = res.data
+      } else {
+        this.$message.danger('分类表格数据获取失败！')
+      }
+    },
+    // 获取文章状态列表
+    async getArticleStatusList () {
+      const res = await acticleApi.getArticleStatusList()
+      if (res.code === 20000) {
+        this.articleStatusList = res.data
+      } else {
+        this.$message.danger('文章状态列表获取失败！')
+      }
+    },
+    // 根据文章id查询文章数据
+    async queryActicleDataById (id) {
+      const res = await acticleApi.queryActicleDataById(id)
+      if (res.code === 20000) {
+        this.articleForm = res.data
+        console.log(this.articleForm)
+      } else {
+        this.$message.danger('文章数据获取失败！')
+      }
+    },
     // 当移除文件 触发事件
     handleRemove (file, fileList) {
       this.fileList = fileList

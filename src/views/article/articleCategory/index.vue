@@ -25,7 +25,7 @@
         <el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-close" @click="showCategoryTable=false" />
       </div>
       <el-alert v-show="showAlert" :title="'已选中 '+choosedTotol+' 项'" type="warning" close-text="删除" @close="deleteCategory(deleteCategoryId)" />
-      <el-table ref="categoryTable" :data="categoryTableData" tooltip-effect="dark" style="width: 100%" height="292" @selection-change="handleSelectionChange">
+      <el-table ref="categoryTable" v-loading="listLoading" :data="categoryTableData" tooltip-effect="dark" style="width: 100%" height="292" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" />
         <el-table-column prop="name" label="名称" />
         <el-table-column prop="icon" label="图标" />
@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import acticleApi from '@/api/acticle'
 const defaultArticleCategoryForm = {
   name: '',
   icon: ''
@@ -75,40 +76,10 @@ export default {
           { required: true, validator: validatePass, trigger: 'blur' }
         ]
       },
+      // 是否loading加载表格数据
+      listLoading: true,
       // 分类表格数据
-      categoryTableData: [
-        {
-          id: 1,
-          name: '科技',
-          icon: 'el-icon-cpu'
-        },
-        {
-          id: 2,
-          name: '游戏',
-          icon: 'el-icon-coordinate'
-        },
-        {
-          id: 3,
-          name: '服装',
-          icon: 'el-icon-s-goods'
-        },
-        {
-          id: 4,
-          name: '美食',
-          icon: 'el-icon-food'
-        },
-        {
-          id: 5,
-          name: '天气',
-          icon: 'el-icon-heavy-rain'
-        },
-        {
-          id: 6,
-          name: '运动',
-          icon: 'el-icon-bangzhu'
-        }
-
-      ],
+      categoryTableData: [],
       // 删除分类id
       deleteCategoryId: [],
       // 是否显示Alert提示框
@@ -151,7 +122,22 @@ export default {
       }
     }
   },
+  created () {
+    // 获取分类表格数据
+    this.getCategoryTableData()
+  },
   methods: {
+    // 获取分类表格数据
+    async getCategoryTableData () {
+      this.listLoading = true
+      const res = await acticleApi.getCategoryTableData()
+      if (res.code === 20000) {
+        this.categoryTableData = res.data
+      } else {
+        this.$message.danger('分类表格数据获取失败！')
+      }
+      this.listLoading = false
+    },
     // 重置表单
     resetFormData () {
       this.articleCategoryForm = JSON.parse(JSON.stringify(defaultArticleCategoryForm))
@@ -162,22 +148,34 @@ export default {
     },
     // 提交表单
     submitHandle () {
-      this.$refs.articleCategoryForm.validate((valid) => {
+      this.$refs.articleCategoryForm.validate(async (valid) => {
         if (valid) {
-          this.$message.success('校验通过')
+          let res
+          if (this.articleCategoryForm.id) {
+            res = await acticleApi.editCategoryData({ ...this.articleCategoryForm })
+          } else {
+            res = await acticleApi.addCategoryData({ ...this.articleCategoryForm })
+          }
+          if (res.code === 20000) {
+            this.getCategoryTableData()
+            this.resetFormData()
+            this.$message.success(res.msg)
+          } else {
+            this.$message.danger('操作失败！')
+          }
         }
       })
     },
+    // 当多选框按钮被选中时 触发事件
     handleSelectionChange (selection) {
       this.choosedTotol = selection.length
       const ids = []
       selection.forEach(item => ids.push(item.id))
       this.deleteCategoryId = ids
     },
-    handleCurrentChange () { },
     // 编辑分类数据
     editCategory (row) {
-      this.articleCategoryForm = row
+      this.articleCategoryForm = JSON.parse(JSON.stringify(row))
     },
     // 删除分类数据
     deleteCategory (id) {
@@ -185,26 +183,20 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        if (Array.isArray(id)) {
-          for (let i = 0; i < id.length; i++) {
-            this.categoryTableData.some((item, index) => {
-              if (item.id === id[i]) {
-                this.categoryTableData.splice(index, 1)
-              }
-            })
-          }
+      }).then(async () => {
+        const res = await acticleApi.deleteCategoryData(id)
+        if (res.code === 20000) {
+          this.getCategoryTableData()
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
         } else {
-          this.categoryTableData.some((item, index) => {
-            if (item.id === id) {
-              this.categoryTableData.splice(index, 1)
-            }
+          this.$message({
+            type: 'danger',
+            message: '删除失败!'
           })
         }
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
       }).catch(() => {
         this.$message({
           type: 'info',
