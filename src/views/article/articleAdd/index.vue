@@ -31,7 +31,7 @@
           </div>
           <div class="article-photo">
             <label>封面</label>
-            <el-upload action="https://jsonplaceholder.typicode.com/posts/" :on-preview="handlePreview" :on-remove="handleRemove" :file-list="fileList" list-type="picture" :limit="1" :on-success="handleSuccess" :on-error="handleError">
+            <el-upload action="https://jsonplaceholder.typicode.com/posts/" accept="image/png,image/jpeg" :on-preview="handlePreview" :on-remove="handleRemove" :before-upload="beforeUpload" :file-list="fileList" list-type="picture" :limit="1" :on-success="handleSuccess" :on-error="handleError">
               <el-button size="small" type="primary">点击上传</el-button>
               <p slot="tip">只能上传jpg/png文件，且不超过500kb</p>
             </el-upload>
@@ -168,6 +168,18 @@ export default {
     // 当移除文件 触发事件
     handleRemove (file, fileList) {
       this.fileList = fileList
+    },
+    // 上传文件时的钩子 限制文件格式和大小
+    beforeUpload (file) {
+      const isPhoto = file.type === 'image/jpeg' || file.type === 'image/png'
+      const isLimit = file.size / 1024 < 500
+      if (!isPhoto) {
+        this.$message.error('只能上传 jpg/png 图片!')
+      }
+      if (!isLimit) {
+        this.$message.error('上传图片大小不能超过 500KB!')
+      }
+      return isPhoto && isLimit
     },
     // 当选中文件 触发事件
     handlePreview (file) {
