@@ -31,7 +31,7 @@
           </div>
           <div class="article-photo">
             <label>封面</label>
-            <el-upload action="https://jsonplaceholder.typicode.com/posts/" accept="image/png,image/jpeg" :on-preview="handlePreview" :on-remove="handleRemove" :before-upload="beforeUpload" :file-list="fileList" list-type="picture" :limit="1" :on-success="handleSuccess" :on-error="handleError">
+            <el-upload action="https://jsonplaceholder.typicode.com/posts/" accept="image/png,image/jpeg" :on-preview="handlePreview" :on-remove="handleRemove" :before-upload="beforeUpload" :file-list="articleForm.fileList" list-type="picture" :limit="1" :on-success="handleSuccess" :on-error="handleError">
               <el-button size="small" type="primary">点击上传</el-button>
               <p slot="tip">只能上传jpg/png文件，且不超过500kb</p>
             </el-upload>
@@ -85,7 +85,7 @@ export default {
       // 文章状态列表
       articleStatusList: [],
       // 文件列表
-      fileList: [],
+      // fileList: [],
       // 标签id
       tagId: '',
       // 标签列表
@@ -113,6 +113,12 @@ export default {
         } else {
           return []
         }
+      }
+    },
+    // 是否为编辑状态
+    isEdit: {
+      get () {
+        return this.articleForm.id != null
       }
     }
   },
@@ -161,14 +167,13 @@ export default {
       const res = await articleApi.queryArticleDataById(id)
       if (res.code === 20000) {
         this.articleForm = res.data
-        console.log(this.articleForm)
       } else {
         this.$message.error('文章数据获取失败！')
       }
     },
     // 当移除文件 触发事件
     handleRemove (file, fileList) {
-      this.fileList = fileList
+      this.articleForm.fileList = fileList
     },
     // 上传文件时的钩子 限制文件格式和大小
     beforeUpload (file) {
@@ -188,15 +193,41 @@ export default {
     },
     // 当文件上传成功 触发事件
     handleSuccess (resp, file, fileList) {
-      this.fileList = fileList
+      const data = []
+      const obj = {}
+      obj.uid = fileList[0].uid
+      obj.name = fileList[0].name
+      obj.url = fileList[0].url
+      data.push(obj)
+      this.articleForm.fileList = data
     },
     // 当文件上传失败触发事件
     handleError (err, file, fileList) {
       this.$message.error(err)
     },
     // 提交表单数据
-    submitHandle () {
-      console.log(this.articleForm)
+    async submitHandle () {
+      if (!this.articleForm.title && !this.articleForm.content) {
+        document.querySelector('#article-title-input').focus()
+        return this.$message.error('请填写文章标题和内容！')
+      }
+      if (this.isEdit) {
+        const res = await articleApi.editArticleData(this.articleForm)
+        if (res.code === 20000) {
+          this.$message.success('修改成功！')
+          this.$router.push('/article/articleList')
+        } else {
+          this.$message.error('修改失败！')
+        }
+      } else {
+        const res = await articleApi.addArticleData(this.articleForm)
+        if (res.code === 20000) {
+          this.$message.success('新增成功！')
+          this.$router.push('/article/articleList')
+        } else {
+          this.$message.error('新增失败！')
+        }
+      }
     },
     // 返回
     goBack () {

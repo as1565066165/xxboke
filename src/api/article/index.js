@@ -19,6 +19,14 @@ const api = {
       method: 'get'
     })
   },
+  // 新增文章数据
+  addArticleData (data) {
+    return request({
+      url: `/article/addArticleData`,
+      method: 'post',
+      data
+    })
+  },
   // 删除文章数据
   deleteArticleData (id) {
     if (Array.isArray(id)) {
@@ -32,6 +40,14 @@ const api = {
         method: 'delete'
       })
     }
+  },
+  // 修改文章数据
+  editArticleData (data) {
+    return request({
+      url: `/article/editArticleData`,
+      method: 'put',
+      data
+    })
   },
   // 根据文章id获取文章数据
   queryArticleDataById (id) {

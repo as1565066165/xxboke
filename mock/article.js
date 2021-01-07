@@ -22,7 +22,7 @@ const data = Mock.mock({
     {
       id: '@natural()',
       userName: 'luoxu',
-      title: '@csentence(10,20)',
+      title: '@ctitle(10,20)',
       content: '@csentence(50,300)',
       tagsId: function () {
         const ids = []
@@ -35,7 +35,12 @@ const data = Mock.mock({
       createdTime: '@date("yyyy-MM-dd HH:mm:ss")',
       categoryId: function () {
         return categoryData.data[parseInt(Math.random() * 6)].id
-      }
+      },
+      fileList: [{
+        uid: '@natural()',
+        name: '@ctitle(2,5).png',
+        url: "@image('200x100','@color()')"
+      }]
     }
   ]
 })
@@ -98,6 +103,43 @@ module.exports = [
           label: '草稿',
           value: '0'
         }]
+      }
+    }
+  },
+  // 新增文章数据
+  {
+    url: '/article/addArticleData',
+    type: 'post',
+    response: config => {
+      const res = config.body
+      const id = parseInt(Math.random() * 999999999)
+      res.status = res.status || '0'
+      res.id = id
+      res.userName = 'luoxu'
+      res.createdTime = formatDateTime(new Date())
+      data.data.unshift(res)
+      return {
+        code: 20000,
+        msg: '新增成功！'
+      }
+    }
+  },
+  // 修改文章数据
+  {
+    url: '/article/editArticleData',
+    type: 'put',
+    response: config => {
+      const res = config.body
+      const id = res.id
+      data.data.some(item => {
+        if (item.id === id) {
+          Object.assign(item, res)
+        }
+      }
+      )
+      return {
+        code: 20000,
+        msg: '修改成功！'
       }
     }
   },
@@ -303,3 +345,17 @@ module.exports = [
     }
   }
 ]
+function formatDateTime (date) {
+  const y = date.getFullYear()
+  let m = date.getMonth() + 1
+  m = m < 10 ? ('0' + m) : m
+  let d = date.getDate()
+  d = d < 10 ? ('0' + d) : d
+  let h = date.getHours()
+  h = h < 10 ? ('0' + h) : h
+  let minute = date.getMinutes()
+  minute = minute < 10 ? ('0' + minute) : minute
+  let second = date.getSeconds()
+  second = second < 10 ? ('0' + second) : second
+  return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second
+}
