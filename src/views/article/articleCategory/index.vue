@@ -1,52 +1,57 @@
 <template>
   <div class="article-category-container el-row">
-    <el-card v-show="showCategoryForm" shadow="hover" class="article-category-card el-col-12 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-12 el-col-xl-12">
-      <div slot="header" class="clearfix">
-        <b>{{ isEdit?'编辑分类':'添加分类' }}</b>
-        <el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-close" @click="showCategoryForm=false" />
-      </div>
-      <el-form ref="articleCategoryForm" label-position="top" :rules="articleCategoryFormRules" label-width="80px" :model="articleCategoryForm">
-        <el-form-item label="名称" prop="name">
-          <el-input v-model="articleCategoryForm.name" placeholder="请输入分类名称" />
-        </el-form-item>
-        <el-form-item label="图标" prop="icon">
-          <el-input v-model="articleCategoryForm.icon" placeholder="请输入element-ui的icon" />
-          <a class="icon-a" title="传送至element-ui图标集合" href="https://element.eleme.cn/#/zh-CN/component/icon#tu-biao-ji-he" target="blank">图标传送门</a>
-        </el-form-item>
-      </el-form>
-      <div class="button-box">
-        <el-button type="primary" size="small" @click="submitHandle">{{ isEdit?'修改':'添加' }}</el-button>
-        <el-button v-show="isEdit" style="marginLeft:20px" icon="el-icon-document-add" type="success" size="small" @click="resetFormData">新增分类</el-button>
-      </div>
-    </el-card>
-    <el-card v-show="showCategoryTable" shadow="hover" class="article-category-card el-col-12 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-12 el-col-xl-12">
-      <div slot="header" class="clearfix">
-        <b>分类表格</b>
-        <el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-close" @click="showCategoryTable=false" />
-      </div>
-      <el-alert v-show="showAlert" :title="'已选中 '+choosedTotol+' 项'" type="warning" close-text="删除" @close="deleteCategory(deleteCategoryId)" />
-      <el-table ref="categoryTable" v-loading="listLoading" :data="categoryTableData" tooltip-effect="dark" style="width: 100%" height="292" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" />
-        <el-table-column prop="name" label="名称" />
-        <el-table-column prop="icon" label="图标" />
-        <el-table-column label="展示" align="center">
-          <template v-slot="{row}">
-            <i :class="row.icon" />
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" fixed="right" width="100">
-          <template v-slot="{row}">
-            <el-button type="text" @click="editCategory(row)">编辑</el-button>
-            <el-button type="text" @click="deleteCategory(row.id)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+    <div v-show="showCategoryForm" class="article-category-card el-col-12 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-12 el-col-xl-12">
+      <el-card shadow="hover" class="card-content">
+        <div slot="header" class="clearfix">
+          <b>{{ isEdit?'编辑分类':'添加分类' }}</b>
+          <el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-close" @click="showCategoryForm=false" />
+        </div>
+        <el-form ref="articleCategoryForm" label-position="top" :rules="articleCategoryFormRules" label-width="80px" :model="articleCategoryForm">
+          <el-form-item label="名称" prop="name">
+            <el-input v-model="articleCategoryForm.name" placeholder="请输入分类名称" />
+          </el-form-item>
+          <el-form-item label="图标" prop="icon">
+            <el-input v-model="articleCategoryForm.icon" placeholder="请输入element-ui的icon" />
+            <a class="icon-a" title="传送至element-ui图标集合" href="https://element.eleme.cn/#/zh-CN/component/icon#tu-biao-ji-he" target="blank">图标传送门</a>
+          </el-form-item>
+        </el-form>
+        <div class="button-box">
+          <el-button type="primary" size="small" @click="submitHandle">{{ isEdit?'修改':'添加' }}</el-button>
+          <el-button v-show="isEdit" style="marginLeft:20px" icon="el-icon-document-add" type="success" size="small" @click="resetFormData">新增分类</el-button>
+        </div>
+      </el-card>
+    </div>
+    <div v-show="showCategoryTable" class="article-category-card el-col-12 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-12 el-col-xl-12">
+      <el-card shadow="hover" class="card-content">
+        <div slot="header" class="clearfix">
+          <b>分类表格</b>
+          <el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-close" @click="showCategoryTable=false" />
+        </div>
+        <el-alert v-show="showAlert" :title="'已选中 '+choosedTotol+' 项'" type="warning" close-text="删除" @close="deleteCategory(deleteCategoryId)" />
+        <el-table ref="categoryTable" v-loading="listLoading" :data="categoryTableData" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+          <el-table-column type="selection" width="55" />
+          <el-table-column prop="name" label="名称" />
+          <el-table-column prop="icon" label="图标" />
+          <el-table-column label="展示" align="center">
+            <template v-slot="{row}">
+              <i :class="row.icon" />
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" fixed="right" width="100">
+            <template v-slot="{row}">
+              <el-button type="text" @click="editCategory(row)">编辑</el-button>
+              <el-button type="text" @click="deleteCategory(row.id)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
+    </div>
+
   </div>
 </template>
 
 <script>
-import acticleApi from '@/api/acticle'
+import articleApi from '@/api/article'
 const defaultArticleCategoryForm = {
   name: '',
   icon: ''
@@ -130,11 +135,11 @@ export default {
     // 获取分类表格数据
     async getCategoryTableData () {
       this.listLoading = true
-      const res = await acticleApi.getCategoryTableData()
+      const res = await articleApi.getCategoryTableData()
       if (res.code === 20000) {
         this.categoryTableData = res.data
       } else {
-        this.$message.danger('分类表格数据获取失败！')
+        this.$message.error('分类表格数据获取失败！')
       }
       this.listLoading = false
     },
@@ -152,16 +157,16 @@ export default {
         if (valid) {
           let res
           if (this.articleCategoryForm.id) {
-            res = await acticleApi.editCategoryData({ ...this.articleCategoryForm })
+            res = await articleApi.editCategoryData({ ...this.articleCategoryForm })
           } else {
-            res = await acticleApi.addCategoryData({ ...this.articleCategoryForm })
+            res = await articleApi.addCategoryData({ ...this.articleCategoryForm })
           }
           if (res.code === 20000) {
             this.getCategoryTableData()
             this.resetFormData()
             this.$message.success(res.msg)
           } else {
-            this.$message.danger('操作失败！')
+            this.$message.error('操作失败！')
           }
         }
       })
@@ -184,7 +189,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(async () => {
-        const res = await acticleApi.deleteCategoryData(id)
+        const res = await articleApi.deleteCategoryData(id)
         if (res.code === 20000) {
           this.getCategoryTableData()
           this.$message({
@@ -193,7 +198,7 @@ export default {
           })
         } else {
           this.$message({
-            type: 'danger',
+            type: 'error',
             message: '删除失败!'
           })
         }
@@ -210,11 +215,11 @@ export default {
 
 <style lang="scss">
 .article-category {
-  &-container {
-    padding: 10px;
-  }
   &-card {
-    padding: 16px;
+    padding: 10px;
+    .card-content {
+      padding: 16px;
+    }
     .el-form-item {
       padding: 0 10px;
     }

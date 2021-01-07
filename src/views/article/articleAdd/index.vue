@@ -39,7 +39,12 @@
           <div />
           <div class="article-tag">
             <label>标签</label>
-            <el-tree :data="tagsList" show-checkbox node-key="id" default-expand-all :props="defaultProps" highlight-current @check="checkHandle" />
+            <el-select v-model="tagId" size="medium" placeholder="请选择" style="width:100%" @change="handleSelectChange">
+              <el-option v-for="item in tagsList" :key="item.id" :label="item.name" :value="item.id" />
+            </el-select>
+            <div v-show="choosedTagList.length" class="tag-box">
+              <el-tag v-for="item in choosedTagList" :key="item.id" effect="plain" closable @close="handleClose(item.id)">{{ item.name }}</el-tag>
+            </div>
           </div>
         </div>
       </div>
@@ -55,7 +60,7 @@
 
 <script>
 import myEditor from './components/myEditor.vue'
-import acticleApi from '@/api/acticle'
+import articleApi from '@/api/article'
 export default {
   components: {
     myEditor
@@ -81,88 +86,84 @@ export default {
       articleStatusList: [],
       // 文件列表
       fileList: [],
+      // 标签id
+      tagId: '',
       // 标签列表
-      tagsList: [{
-        id: 1,
-        label: 'Java',
-        children: [{
-          id: 4,
-          label: 'Java基础',
-          children: [{
-            id: 9,
-            label: 'Java多线程'
-          }, {
-            id: 10,
-            label: 'Java开发模式'
-          }]
-        }]
-      }, {
-        id: 2,
-        label: '计算机科学',
-        children: [{
-          id: 5,
-          label: '数据结构和算法'
-        }, {
-          id: 6,
-          label: '操作系统'
-        }]
-      }, {
-        id: 3,
-        label: '其他文章',
-        children: [{
-          id: 7,
-          label: '科研前线'
-        }, {
-          id: 8,
-          label: '地方美食'
-        }]
-      }],
-      // 树配置
-      defaultProps: {
-        children: 'children',
-        label: 'label'
-      },
+      tagsList: [],
+      // 被选中的标签列表
+      // choosedTagList: [],
       // 文章分类
       categoryOptions: []
+    }
+  },
+  computed: {
+    choosedTagList: {
+      // eslint-disable-next-line vue/return-in-computed-property
+      get () {
+        if (this.articleForm.tagsId) {
+          const arr = []
+          this.articleForm.tagsId.forEach(item => {
+            this.tagsList.some(item1 => {
+              if (item1.id === item) {
+                arr.push(item1)
+              }
+            })
+          })
+          return arr
+        } else {
+          return []
+        }
+      }
     }
   },
   created () {
     const id = this.$route.query.articleId
     if (id) {
-      this.queryActicleDataById(id)
+      this.queryArticleDataById(id)
     }
     // 获取分类列表
     this.getCategoryData()
     // 获取文章状态列表
     this.getArticleStatusList()
+    // 获取标签列表
+    this.getTagList()
   },
   methods: {
     // 获取分类表格数据
     async getCategoryData () {
-      const res = await acticleApi.getCategoryTableData()
+      const res = await articleApi.getCategoryTableData()
       if (res.code === 20000) {
         this.categoryOptions = res.data
       } else {
-        this.$message.danger('分类表格数据获取失败！')
+        this.$message.error('分类表格数据获取失败！')
       }
     },
     // 获取文章状态列表
     async getArticleStatusList () {
-      const res = await acticleApi.getArticleStatusList()
+      const res = await articleApi.getArticleStatusList()
       if (res.code === 20000) {
         this.articleStatusList = res.data
       } else {
-        this.$message.danger('文章状态列表获取失败！')
+        this.$message.error('文章状态列表获取失败！')
+      }
+    },
+    // 获取所有标签列表
+    async getTagList () {
+      const res = await articleApi.getTagList()
+      if (res.code === 20000) {
+        this.tagsList = res.data.data
+      } else {
+        this.$message.error('标签列表获取失败！')
       }
     },
     // 根据文章id查询文章数据
-    async queryActicleDataById (id) {
-      const res = await acticleApi.queryActicleDataById(id)
+    async queryArticleDataById (id) {
+      const res = await articleApi.queryArticleDataById(id)
       if (res.code === 20000) {
         this.articleForm = res.data
         console.log(this.articleForm)
       } else {
-        this.$message.danger('文章数据获取失败！')
+        this.$message.error('文章数据获取失败！')
       }
     },
     // 当移除文件 触发事件
@@ -193,10 +194,6 @@ export default {
     handleError (err, file, fileList) {
       this.$message.error(err)
     },
-    // 当选中树的复选框 触发事件
-    checkHandle (dataNode, checkedNodes, currentNode) {
-      this.articleForm.tagsId = checkedNodes.checkedKeys
-    },
     // 提交表单数据
     submitHandle () {
       console.log(this.articleForm)
@@ -204,6 +201,35 @@ export default {
     // 返回
     goBack () {
       this.$router.go(-1)
+    },
+    // 当标签下拉框的选项改变时 触发事件
+    handleSelectChange (id) {
+      // 如果没有则添加
+      const isOnly = !this.articleForm.tagsId.some(item => item === id)
+      if (isOnly) {
+        this.articleForm.tagsId.push(id)
+      }
+      // if (isOnly) {
+      //   this.articleForm.tagsId.push(id)
+      //   this.tagsList.some(item => {
+      //     if (item.id === id) {
+      //       this.choosedTagList.push(item)
+      //     }
+      //   })
+      // }
+    },
+    // 当点击了标签的删除按钮 触发事件
+    handleClose (id) {
+      this.articleForm.tagsId.some((item, index) => {
+        if (item === id) {
+          this.articleForm.tagsId.splice(index, 1)
+        }
+      })
+      this.choosedTagList.some((item, index) => {
+        if (item.id === id) {
+          this.choosedTagList.splice(index, 1)
+        }
+      })
     }
   }
 }
@@ -229,6 +255,20 @@ export default {
       line-height: 40px;
       padding: 0 12px 0 0;
       box-sizing: border-box;
+    }
+    .article-tag {
+      .tag-box {
+        margin-top: 10px;
+        padding: 5px;
+        border-top: 1px solid #dcdfe6;
+        // border-radius: 5px;
+        .el-tag {
+          margin: 10px 10px 0 0;
+        }
+        .el-tag:hover {
+          background-color: #eee;
+        }
+      }
     }
   }
 }

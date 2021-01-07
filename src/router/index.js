@@ -77,7 +77,14 @@ export const constantRoutes = [
       name: 'ArticleAdd',
       component: () => import('@/views/article/articleAdd/index'),
       meta: { title: '文章编撰', icon: 'el-icon-edit-outline' }
-    }]
+    },
+    {
+      path: 'articleTag',
+      name: 'ArticleTag',
+      component: () => import('@/views/article/articleTag/index'),
+      meta: { title: '文章标签', icon: 'el-icon-price-tag' }
+    }
+    ]
   },
   {
     path: '/example',

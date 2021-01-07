@@ -1,6 +1,14 @@
 const Mock = require('mockjs')
 // const axios = require('axios')
 // const result = (async function () { return await axios.get('https://www.ip.cn/api/index?ip=218.104.155.137&type=0') })()
+const tagData = Mock.mock({
+  'data|100': [
+    {
+      id: '@natural()',
+      name: '@ctitle(2,5)'
+    }
+  ]
+})
 const categoryData = Mock.mock({
   'data|6': [{
     id: '@natural()',
@@ -16,6 +24,13 @@ const data = Mock.mock({
       userName: 'luoxu',
       title: '@csentence(10,20)',
       content: '@csentence(50,300)',
+      tagsId: function () {
+        const ids = []
+        const start = parseInt(Math.random() * 100)
+        const end = start + parseInt(Math.random() * 5)
+        tagData.data.forEach(item => ids.push(item.id))
+        return ids.slice(start, end)
+      },
       'status|1': ['0', '1'],
       createdTime: '@date("yyyy-MM-dd HH:mm:ss")',
       categoryId: function () {
@@ -28,7 +43,7 @@ const data = Mock.mock({
 module.exports = [
   // 获取文章列表数据
   {
-    url: '/acticle/getActicleList',
+    url: '/article/getArticleList',
     type: 'get',
     response: config => {
       // 获取请求参数
@@ -70,7 +85,7 @@ module.exports = [
   },
   // 获取文章状态列表数据
   {
-    url: '/acticle/getArticleStatusList',
+    url: '/article/getArticleStatusList',
     type: 'get',
     response: config => {
       return {
@@ -88,14 +103,14 @@ module.exports = [
   },
   // 删除文章数据
   {
-    url: '/acticle/deleteActicleData',
+    url: '/article/deleteArticleData',
     type: 'delete',
     response: config => {
       const res = config.query
-      const acticleId = res.acticleId.split(',')
-      for (let i = 0; i < acticleId.length; i++) {
+      const articleId = res.articleId.split(',')
+      for (let i = 0; i < articleId.length; i++) {
         data.data.some((item, index) => {
-          if (item.id.toString() === acticleId[i]) {
+          if (item.id.toString() === articleId[i]) {
             data.data.splice(index, 1)
           }
         })
@@ -108,11 +123,11 @@ module.exports = [
   },
   // 根据文章id获取文章数据
   {
-    url: '/acticle/queryActicleDataById',
+    url: '/article/queryArticleDataById',
     type: 'get',
     response: config => {
       const res = config.query
-      const id = res.acticleId
+      const id = res.articleId
       // eslint-disable-next-line no-return-assign
       const result = data.data.filter(item => item.id.toString() === id)
       return {
@@ -123,7 +138,7 @@ module.exports = [
   },
   // 获取文章分类列表数据
   {
-    url: '/acticle/getCategoryTableData',
+    url: '/article/getCategoryTableData',
     type: 'get',
     response: config => {
       return {
@@ -134,7 +149,7 @@ module.exports = [
   },
   // 新增文章分类列表数据
   {
-    url: '/acticle/addCategoryData',
+    url: '/article/addCategoryData',
     type: 'post',
     response: config => {
       const res = config.body
@@ -148,7 +163,7 @@ module.exports = [
   },
   // 删除文章分类列表数据
   {
-    url: '/acticle/deleteCategoryData',
+    url: '/article/deleteCategoryData',
     type: 'delete',
     response: config => {
       const res = config.query
@@ -168,7 +183,7 @@ module.exports = [
   },
   // 编辑文章分类列表数据
   {
-    url: '/acticle/editCategoryData',
+    url: '/article/editCategoryData',
     type: 'put',
     response: config => {
       const res = config.query
@@ -179,6 +194,106 @@ module.exports = [
         if (item.id.toString() === id) {
           item.name = name
           item.icon = icon
+        }
+      })
+      return {
+        code: 20000,
+        msg: '修改成功！'
+      }
+    }
+  },
+  // 获取分页标签列表数据
+  {
+    url: '/article/getTagList',
+    type: 'get',
+    response: config => {
+      // 获取请求参数
+      const res = config.query
+      const page = parseInt(res.page)
+      const pageSize = parseInt(res.pageSize)
+      // 开始
+      const start = (page - 1) * pageSize
+      // 结束
+      const end = start + pageSize
+      const result = tagData.data
+      return {
+        code: 20000,
+        data: {
+          page,
+          pageSize,
+          total: result.length,
+          data: result.slice(start, end)
+        }
+      }
+    }
+  },
+  // 获取所有标签列表数据
+  {
+    url: '/article/getAllTagList',
+    type: 'get',
+    response: config => {
+      const result = tagData.data
+      return {
+        code: 20000,
+        data: {
+          data: result
+        }
+      }
+    }
+  },
+  // 新增标签列表数据
+  {
+    url: '/article/addTagData',
+    type: 'post',
+    response: config => {
+      const res = config.body
+      const flag = tagData.data.some(item => item.name === res.name)
+      if (flag) {
+        return {
+          code: 20000,
+          status: 0,
+          msg: '标签已经存在'
+        }
+      } else {
+        res.id = parseInt(Math.random() * 999999999)
+        tagData.data.unshift(res)
+        return {
+          code: 20000,
+          status: 1,
+          msg: '新增成功！'
+        }
+      }
+    }
+  },
+  // 删除标签列表数据
+  {
+    url: '/article/deleteTagData',
+    type: 'delete',
+    response: config => {
+      const res = config.query
+      const tagId = res.tagId
+      tagData.data.some((item, index) => {
+        if (item.id.toString() === tagId) {
+          tagData.data.splice(index, 1)
+        }
+      })
+      return {
+        code: 20000,
+        msg: '删除成功！'
+      }
+    }
+  },
+  // 编辑标签列表数据
+  {
+    url: '/article/editTagData',
+    type: 'put',
+    response: config => {
+      const res = config.query
+      const id = res.id
+      const name = res.name
+      tagData.data.some(item => {
+        if (item.id.toString() === id) {
+          item.name = name
         }
       })
       return {

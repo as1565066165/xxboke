@@ -15,14 +15,14 @@
         </div>
         <div class="el-col-6 el-col-xs-24 el-col-sm-24 el-col-md-6 el-col-lg-6 el-col-xl-6 ">
           <div class="search-button-box">
-            <el-button type="primary" size="medium" @click="getActicleList">查询</el-button>
+            <el-button type="primary" size="medium" @click="getArticleList">查询</el-button>
             <el-button size="medium" @click="resetData">重置</el-button>
           </div>
         </div>
       </div>
       <div class="funtion-button-box el-row">
         <el-button class="el-col-xs-24" icon="el-icon-plus" type="primary" size="medium" @click="goAddArticlePage">发布新文章</el-button>
-        <el-button class="el-col-xs-24" icon="el-icon-delete" size="medium" @click="multDeleteActicleData">批量删除</el-button>
+        <el-button class="el-col-xs-24" icon="el-icon-delete" size="medium" @click="multDeleteArticleData">批量删除</el-button>
         <el-button class="el-col-xs-24" icon="el-icon-refresh" size="medium" @click="$router.go(0)">刷新</el-button>
         <el-button class="el-col-xs-24" :type="showSearchBox?'primary':'warning'" size="medium" plain @click="changeSearchBoxStatus">{{ showSearchBox?'关闭搜索':'开启搜索' }}</el-button>
         <el-button class="el-col-xs-24" :type="showAlert?'danger':'success'" size="medium" plain @click="changeAlertStatus">{{ showAlert?'关闭提示':'开启提示' }}</el-button>
@@ -44,8 +44,8 @@
           <el-table-column prop="createdTime" label="创建时间" width="200" show-overflow-tooltip />
           <el-table-column label="操作" fixed="right" width="100">
             <template v-slot="{row}">
-              <el-button type="text" @click="goActicleEditPage(row.id)">编辑</el-button>
-              <el-button type="text" @click="deleteActicleData(row.id)">删除</el-button>
+              <el-button type="text" @click="goArticleEditPage(row.id)">编辑</el-button>
+              <el-button type="text" @click="deleteArticleData(row.id)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import acticleApi from '@/api/acticle'
+import articleApi from '@/api/article'
 export default {
   data () {
     return {
@@ -95,35 +95,35 @@ export default {
       // 数据总数
       total: 100,
       // 要删除的文章id数组
-      deleteActicleId: []
+      deleteArticleId: []
     }
   },
   created () {
     // 获取文章列表数据
-    this.getActicleList()
+    this.getArticleList()
     // 获取文章状态列表
     this.getArticleStatusList()
   },
   methods: {
     // 获取文章列表数据
-    async getActicleList () {
+    async getArticleList () {
       this.listLoading = true
-      const res = await acticleApi.getActicleList({ page: this.page, pageSize: this.pageSize, ...this.searchForm })
+      const res = await articleApi.getArticleList({ page: this.page, pageSize: this.pageSize, ...this.searchForm })
       if (res.code === 20000) {
         this.tableData = res.data.data
         this.total = res.data.total
       } else {
-        this.$message.danger('文章列表数据获取失败！')
+        this.$message.error('文章列表数据获取失败！')
       }
       this.listLoading = false
     },
     // 获取文章状态列表
     async getArticleStatusList () {
-      const res = await acticleApi.getArticleStatusList()
+      const res = await articleApi.getArticleStatusList()
       if (res.code === 20000) {
         this.articleStatusList = res.data
       } else {
-        this.$message.danger('文章状态列表获取失败！')
+        this.$message.error('文章状态列表获取失败！')
       }
     },
     // 当表格中的复选框被选中时 触发事件
@@ -132,7 +132,7 @@ export default {
       selection.forEach(item => {
         ids.push(item.id)
       })
-      this.deleteActicleId = ids
+      this.deleteArticleId = ids
       this.choosedTotol = selection.length
     },
     // 当点击了开启/关闭搜索框 触发事件
@@ -146,19 +146,19 @@ export default {
     // 当每页显示记录总数发生改变时 触发事件
     handleSizeChange (val) {
       this.pageSize = val
-      this.getActicleList()
+      this.getArticleList()
     },
     // 当前页发生改变时 触发事件
     handleCurrentChange (val) {
       this.page = val
-      this.getActicleList()
+      this.getArticleList()
     },
     // 当点击了新增文章按钮 触发事件
     goAddArticlePage () {
       this.$router.push('/article/articleAdd')
     },
     // 当点击了编辑按钮 触发事件
-    goActicleEditPage (id) {
+    goArticleEditPage (id) {
       this.$router.push(`/article/articleAdd?articleId=${id}`)
     },
     // 当点击了重置按钮 触发事件
@@ -169,30 +169,30 @@ export default {
         author: '',
         status: ''
       }
-      this.getActicleList()
+      this.getArticleList()
     },
     // 当点击了删除按钮 删除文章数据
-    deleteActicleData (id) {
+    deleteArticleData (id) {
       this.$confirm('此操作将永久删除该文章, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
         center: true
       }).then(async () => {
-        const res = await acticleApi.deleteActicleData(id)
+        const res = await articleApi.deleteArticleData(id)
         if (res.code === 20000) {
-          this.getActicleList()
+          this.getArticleList()
           this.$message.success('删除成功！')
         } else {
-          this.$message.danger('删除失败！')
+          this.$message.error('删除失败！')
         }
       }).catch(() => {
         this.$$message.info('已取消删除！')
       })
     },
     // 批量删除文章列表数据
-    multDeleteActicleData () {
-      if (this.deleteActicleId.length === 0) {
+    multDeleteArticleData () {
+      if (this.deleteArticleId.length === 0) {
         return this.$message.warning('请选择要删除的数据！')
       }
       this.$confirm('此操作将永久删除该文章, 是否继续?', '提示', {
@@ -201,12 +201,12 @@ export default {
         type: 'warning',
         center: true
       }).then(async () => {
-        const res = await acticleApi.deleteActicleData(this.deleteActicleId)
+        const res = await articleApi.deleteArticleData(this.deleteArticleId)
         if (res.code === 20000) {
-          this.getActicleList()
+          this.getArticleList()
           this.$message.success('删除成功！')
         } else {
-          this.$message.danger('删除失败！')
+          this.$message.error('删除失败！')
         }
       }).catch(() => {
         this.$$message.info('已取消删除！')
