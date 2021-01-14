@@ -3,8 +3,8 @@
     <div v-show="showTagForm" class="article-tag-card el-col-9 el-col-xs-24 el-col-sm-24 el-col-md-9 el-col-lg-9 el-col-xl-9">
       <el-card class="card-content" shadow="hover">
         <div slot="header" class="clearfix">
-          <b>{{ isEdit?'修改标签':'添加标签' }}</b>
-          <el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-close" @click="showTagForm=false" />
+          <b>{{ isEdit ? "修改标签" : "添加标签" }}</b>
+          <el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-close" @click="showTagForm = false" />
         </div>
         <el-form ref="articleTagForm" label-position="top" :rules="articleTagFormRules" label-width="80px" :model="articleTagForm">
           <el-form-item label="名称" prop="name">
@@ -12,7 +12,9 @@
           </el-form-item>
         </el-form>
         <div class="button-box">
-          <el-button type="primary" size="small" @click="submitHandle">{{ isEdit?'确认修改':'确认添加' }}</el-button>
+          <el-button type="primary" size="small" @click="submitHandle">{{
+            isEdit ? "确认修改" : "确认添加"
+          }}</el-button>
           <el-button v-show="isEdit" style="marginLeft:20px" icon="el-icon-document-add" type="success" size="small" @click="resetFormData">返回添加</el-button>
           <el-button v-show="isEdit" style="marginLeft:20px" icon="el-icon-delete" type="danger" size="small" @click="handleClose(articleTagForm.id)">永久删除</el-button>
         </div>
@@ -22,7 +24,7 @@
       <el-card class="card-content" shadow="hover">
         <div slot="header" class="clearfix">
           <b>所有标签</b>
-          <el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-close" @click="showTagList=false" />
+          <el-button style="float: right; padding: 3px 0" type="text" icon="el-icon-close" @click="showTagList = false" />
         </div>
         <div>
           <el-tag v-for="item in articleTags" :key="item.id" effect="plain" :disable-transitions="false" @click="handleEdit(item)">
@@ -30,7 +32,20 @@
           </el-tag>
         </div>
         <div class="pager-box">
-          <el-pagination :current-page="page" :page-sizes="[50,100,200,500]" :pager-count="5" hide-on-single-page :page-size="pageSize" layout="total, prev, pager, next, sizes, jumper" :total="total" background @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+          <el-pagination
+            :prev-text="text1"
+            :next-text="text2"
+            :current-page="page"
+            :page-sizes="[50, 100, 200, 500]"
+            :pager-count="5"
+            hide-on-single-page
+            :page-size="pageSize"
+            :layout="paginationLayout"
+            :total="total"
+            background
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
         </div>
       </el-card>
     </div>
@@ -65,7 +80,13 @@ export default {
       // 当前页记录条数
       pageSize: 50,
       // 数据总数
-      total: 100
+      total: 100,
+      // 分页组件布局
+      paginationLayout: 'total, prev, pager, next, sizes, jumper',
+      // 替代图标显示的上一页文字
+      text1: '',
+      // 替代图标显示的下一页文字
+      text2: ''
     }
   },
   computed: {
@@ -90,11 +111,37 @@ export default {
   },
   created () {
     this.getTagList()
+    // 根据窗口大小获取分页配置
+    this.getPaginationOptions()
+    // 窗口大小改变触发事件
+    this.windowResizeHandle()
   },
   methods: {
+    // 窗口大小改变触发事件
+    windowResizeHandle () {
+      window.addEventListener('resize', () => {
+        this.getPaginationOptions()
+      })
+    },
+    // 根据窗口大小获取分页配置
+    getPaginationOptions () {
+      const flag = window.document.body.clientWidth < 750
+      if (flag) {
+        this.paginationLayout = 'total, prev,next, jumper'
+        this.text1 = '上一页'
+        this.text2 = '下一页'
+      } else {
+        this.paginationLayout = 'total, prev, pager, next, sizes, jumper'
+        this.text1 = ''
+        this.text2 = ''
+      }
+    },
     // 获取标签列表
     async getTagList () {
-      const res = await articleApi.getTagList({ page: this.page, pageSize: this.pageSize })
+      const res = await articleApi.getTagList({
+        page: this.page,
+        pageSize: this.pageSize
+      })
       if (res.code === 20000) {
         this.articleTags = res.data.data
         this.total = res.data.total
@@ -128,22 +175,24 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
         center: true
-      }).then(async () => {
-        const res = await articleApi.deleteTagData(id)
-        if (res.code === 20000) {
-          this.resetFormData()
-          this.getTagList()
-          this.$message.success('删除成功！')
-        } else {
-          this.$message.error('删除失败！')
-        }
-      }).catch(() => {
-        this.$message.info('已取消删除！')
       })
+        .then(async () => {
+          const res = await articleApi.deleteTagData(id)
+          if (res.code === 20000) {
+            this.resetFormData()
+            this.getTagList()
+            this.$message.success('删除成功！')
+          } else {
+            this.$message.error('删除失败！')
+          }
+        })
+        .catch(() => {
+          this.$message.info('已取消删除！')
+        })
     },
     // 提交表单
     submitHandle () {
-      this.$refs.articleTagForm.validate(async (valid) => {
+      this.$refs.articleTagForm.validate(async valid => {
         if (valid) {
           if (this.isEdit) {
             const res = await articleApi.editTagData(this.articleTagForm)

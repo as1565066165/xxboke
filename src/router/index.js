@@ -87,23 +87,15 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/example',
+    path: '/comment',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'el-icon-s-help' },
+    redirect: '/comment/commentMana',
     children: [
       {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
+        path: 'commentMana',
+        name: 'CommentMana',
+        component: () => import('@/views/comment/index'),
+        meta: { title: '评论管理', icon: 'el-icon-chat-dot-square' }
       }
     ]
   },

@@ -13,7 +13,6 @@ export default {
       default: ''
     }
   },
-
   data () {
     return {
       quillUpdateImg: false,
