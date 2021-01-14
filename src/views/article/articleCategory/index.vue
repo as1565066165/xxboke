@@ -16,7 +16,7 @@
           </el-form-item>
         </el-form>
         <div class="button-box">
-          <el-button type="primary" size="small" @click="submitHandle">{{ isEdit?'修改':'添加' }}</el-button>
+          <el-button :loading="loading" type="primary" size="small" @click="submitHandle">{{ isEdit?'修改':'添加' }}</el-button>
           <el-button v-show="isEdit" style="marginLeft:20px" icon="el-icon-document-add" type="success" size="small" @click="resetFormData">新增分类</el-button>
         </div>
       </el-card>
@@ -92,7 +92,9 @@ export default {
       // 是否显示分类表格
       showCategoryTable: true,
       // 是否显示分类表单
-      showCategoryForm: true
+      showCategoryForm: true,
+      // 是否在加载
+      loading: false
     }
   },
   computed: {
@@ -155,6 +157,7 @@ export default {
     submitHandle () {
       this.$refs.articleCategoryForm.validate(async (valid) => {
         if (valid) {
+          this.loading = true
           let res
           if (this.articleCategoryForm.id) {
             res = await articleApi.editCategoryData({ ...this.articleCategoryForm })
@@ -168,6 +171,7 @@ export default {
           } else {
             this.$message.error('操作失败！')
           }
+          this.loading = false
         }
       })
     },

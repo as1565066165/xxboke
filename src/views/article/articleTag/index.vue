@@ -12,7 +12,7 @@
           </el-form-item>
         </el-form>
         <div class="button-box">
-          <el-button type="primary" size="small" @click="submitHandle">{{
+          <el-button :loading="loading" type="primary" size="small" @click="submitHandle">{{
             isEdit ? "确认修改" : "确认添加"
           }}</el-button>
           <el-button v-show="isEdit" style="marginLeft:20px" icon="el-icon-document-add" type="success" size="small" @click="resetFormData">返回添加</el-button>
@@ -32,20 +32,7 @@
           </el-tag>
         </div>
         <div class="pager-box">
-          <el-pagination
-            :prev-text="text1"
-            :next-text="text2"
-            :current-page="page"
-            :page-sizes="[50, 100, 200, 500]"
-            :pager-count="5"
-            hide-on-single-page
-            :page-size="pageSize"
-            :layout="paginationLayout"
-            :total="total"
-            background
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          />
+          <el-pagination :prev-text="text1" :next-text="text2" :current-page="page" :page-sizes="[50, 100, 200, 500]" :pager-count="5" hide-on-single-page :page-size="pageSize" :layout="paginationLayout" :total="total" background @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </div>
       </el-card>
     </div>
@@ -86,7 +73,9 @@ export default {
       // 替代图标显示的上一页文字
       text1: '',
       // 替代图标显示的下一页文字
-      text2: ''
+      text2: '',
+      // 是否在加载
+      loading: false
     }
   },
   computed: {
@@ -194,6 +183,7 @@ export default {
     submitHandle () {
       this.$refs.articleTagForm.validate(async valid => {
         if (valid) {
+          this.loading = true
           if (this.isEdit) {
             const res = await articleApi.editTagData(this.articleTagForm)
             if (res.code === 20000) {
@@ -213,6 +203,7 @@ export default {
               this.$message.error('新增失败！' + res.msg)
             }
           }
+          this.loading = false
         }
       })
     }

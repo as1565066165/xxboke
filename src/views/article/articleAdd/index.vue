@@ -50,7 +50,7 @@
       </div>
     </el-card>
     <el-card class="submit-button-box" shadow="hover">
-      <el-button size="small" type="primary" @click="submitHandle">{{ articleForm.status?'发布':'保存' }}
+      <el-button :loading="loading" size="small" type="primary" @click="submitHandle">{{ articleForm.status?'发布':'保存' }}
       </el-button>
       <el-button size="small" @click="goBack">返回
       </el-button>
@@ -93,7 +93,9 @@ export default {
       // 被选中的标签列表
       // choosedTagList: [],
       // 文章分类
-      categoryOptions: []
+      categoryOptions: [],
+      // 是否在加载
+      loading: false
     }
   },
   computed: {
@@ -211,6 +213,7 @@ export default {
         document.querySelector('#article-title-input').focus()
         return this.$message.error('请填写文章标题和内容！')
       }
+      this.loading = true
       if (this.isEdit) {
         const res = await articleApi.editArticleData(this.articleForm)
         if (res.code === 20000) {
@@ -228,6 +231,7 @@ export default {
           this.$message.error('新增失败！')
         }
       }
+      this.loading = false
     },
     // 返回
     goBack () {

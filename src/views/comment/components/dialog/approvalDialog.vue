@@ -21,7 +21,8 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button size="small" @click="dialogVisible = false">取 消</el-button>
-      <el-button size="small" type="primary" @click="submitHandle">确 定</el-button>
+      <el-button v-if="!isApproval" size="small" type="primary" @click="dialogVisible = false">确认</el-button>
+      <el-button v-else :loading="loading" size="small" type="primary" @click="submitHandle">确 定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -63,7 +64,9 @@ export default {
         comment: [
           { required: true, message: '请填写审批意见', trigger: 'blur' }
         ]
-      }
+      },
+      // 是否在加载
+      loading: false
     }
   },
   computed: {
@@ -108,6 +111,7 @@ export default {
     submitHandle () {
       this.$refs['approvalForm'].validate(async (valid) => {
         if (valid) {
+          this.loading = true
           const res = await commentApi.approvalCommentData({ id: this.data.id, ...this.approvalForm })
           if (res.code === 20000) {
             this.$emit('getCommentList')
@@ -117,6 +121,7 @@ export default {
           } else {
             this.$message.error('审批失败！')
           }
+          this.loading = false
         }
       })
     },
