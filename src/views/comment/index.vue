@@ -152,7 +152,7 @@ export default {
         this.marginLeft = ''
       }
     },
-    // 获取文章列表数据
+    // 获取评论列表数据
     async getCommentList () {
       this.listLoading = true
       const res = await commentApi.getCommentList({ page: this.page, pageSize: this.pageSize, ...this.searchForm })
@@ -164,7 +164,7 @@ export default {
       }
       this.listLoading = false
     },
-    // 获取文章状态列表
+    // 获取评论类型列表
     async getCommentTypeList () {
       const res = await commentApi.getCommentTypeList()
       if (res.code === 20000) {
@@ -173,7 +173,7 @@ export default {
         this.$message.error('评论类型列表获取失败！')
       }
     },
-    // 获取文章状态列表
+    // 获取评论状态列表
     async getCommentStatusList () {
       const res = await commentApi.getCommentStatusList()
       if (res.code === 20000) {
@@ -243,7 +243,7 @@ export default {
       if (this.deleteCommentId.length === 0) {
         return this.$message.warning('请选择要删除的数据！')
       }
-      this.$confirm('此操作将永久删除该评论, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除这些评论, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
