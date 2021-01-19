@@ -122,10 +122,6 @@ export default {
       total: 100,
       // 要删除的用户id数组
       deleteUserId: [],
-      // 审批数据
-      approvalData: {},
-      // 审批对话框的宽度
-      dialogWidth: '60%',
       // 分页组件布局
       paginationLayout: 'total, prev, pager, next, sizes, jumper',
       // 替代图标显示的上一页文字

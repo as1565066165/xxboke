@@ -33,11 +33,14 @@ const data = Mock.mock({
       ename: function () {
         return pinyin(this.name, { tone: false })
       },
+      password: '123456',
       avatar: "@image('40x40','@color()')",
       email: "@email('qq.com')",
       'status|1': ['0', '1'],
       'role|1': ['admin', 'normal'],
-      registerTime: "@date('yyyy-MM-dd HH:mm:ss')"
+      registerTime: "@date('yyyy-MM-dd HH:mm:ss')",
+      desc: '@csentence(5,100)',
+      homePage: '@url("http")'
     }
   ]
 })
@@ -201,6 +204,37 @@ module.exports = [
       }
     }
   },
+  // 根据用户id获取用户数据
+  {
+    url: '/user/queryUserDataById',
+    type: 'get',
+    response: config => {
+      const res = config.query
+      const id = res.userId
+      // eslint-disable-next-line no-return-assign
+      const result = data.data.filter(item => item.id.toString() === id)
+      return {
+        code: 20000,
+        data: result[0]
+      }
+    }
+  },
+  // 新增用户数据
+  {
+    url: '/user/addUserData',
+    type: 'post',
+    response: config => {
+      const res = config.body
+      res.id = parseInt(Math.random() * 9999999)
+      res.ename = pinyin(res.name, { tone: false })
+      res.registerTime = formatDateTime(new Date())
+      data.data.unshift(res)
+      return {
+        code: 20000,
+        msg: '新增成功！'
+      }
+    }
+  },
   // 删除用户数据
   {
     url: '/user/deleteUserData',
@@ -220,5 +254,58 @@ module.exports = [
         msg: '删除成功！'
       }
     }
+  },
+  {
+    url: '/user/editUserData',
+    type: 'put',
+    response: config => {
+      const res = config.body
+      const id = res.id
+      data.data.some(item => {
+        if (item.id === id) {
+          Object.assign(item, res)
+        }
+      })
+      return {
+        code: 20000,
+        msg: '修改成功！'
+      }
+    }
+  },
+  // 修改用户密码
+  {
+    url: '/user/editUserPassword',
+    type: 'put',
+    response: config => {
+      const res = config.body
+      const id = res.id
+      const oldPassword = res.oldPassword
+      let flag = false
+      data.data.some(item => {
+        if (item.id.toString() === id && item.password === oldPassword) {
+          flag = true
+          Object.assign(item, res)
+        }
+      })
+      return {
+        code: 20000,
+        status: flag ? 200 : 201,
+        msg: flag ? '修改成功！' : '旧密码错误！'
+      }
+    }
   }
 ]
+function formatDateTime (date) {
+  const y = date.getFullYear()
+  let m = date.getMonth() + 1
+  m = m < 10 ? ('0' + m) : m
+  let d = date.getDate()
+  d = d < 10 ? ('0' + d) : d
+  let h = date.getHours()
+  h = h < 10 ? ('0' + h) : h
+  let minute = date.getMinutes()
+  minute = minute < 10 ? ('0' + minute) : minute
+  let second = date.getSeconds()
+  second = second < 10 ? ('0' + second) : second
+  return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second
+}
