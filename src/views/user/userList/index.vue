@@ -34,7 +34,7 @@
       </div>
       <div class="funtion-button-box el-row">
         <el-button class="el-col-xs-24" icon="el-icon-plus" type="primary" size="medium" @click="goAddUserPage">新增用户</el-button>
-        <el-button class="el-col-xs-24" icon="el-icon-delete" size="medium" @click="multDeleteUserData">批量删除</el-button>
+        <el-button :style="marginLeft" class="el-col-xs-24" icon="el-icon-delete" size="medium" @click="multDeleteUserData">批量删除</el-button>
         <el-button :style="marginLeft" class="el-col-xs-24" icon="el-icon-refresh" size="medium" @click="$router.go(0)">刷新</el-button>
         <el-button :style="marginLeft" class="el-col-xs-24" :type="showSearchBox?'primary':'warning'" size="medium" plain @click="changeSearchBoxStatus">{{ showSearchBox?'关闭搜索':'开启搜索' }}</el-button>
         <el-button :style="marginLeft" class="el-col-xs-24" :type="showAlert?'danger':'success'" size="medium" plain @click="changeAlertStatus">{{ showAlert?'关闭提示':'开启提示' }}</el-button>

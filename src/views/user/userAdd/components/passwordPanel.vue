@@ -21,6 +21,10 @@ export default {
     isActive: {
       type: Boolean,
       default: true
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -56,6 +60,16 @@ export default {
       }
     }
   },
+  computed: {
+    loading: {
+      set (val) {
+        this.$emit('update:is-loading', val)
+      },
+      get () {
+        return this.isLoading
+      }
+    }
+  },
   created () {
     this.passwordForm.id = this.$route.query.userId
   },
@@ -64,14 +78,21 @@ export default {
     onSubmit () {
       this.$refs['passwordForm'].validate(async (valid) => {
         if (valid) {
+          this.loading = true
           const res = await userApi.editUserPassword(this.passwordForm)
           if (res.status === 200) {
+            this.resetData()
             this.$message.success(res.msg)
           } else {
             this.$message.error(res.msg)
           }
         }
+        this.loading = false
       })
+    },
+    // 重置
+    resetData () {
+      this.$refs['passwordForm'].resetFields()
     }
   }
 }

@@ -52,6 +52,10 @@ export default {
     isEdit: {
       type: Boolean,
       default: false
+    },
+    isLoading: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -103,6 +107,16 @@ export default {
       }
     }
   },
+  computed: {
+    loading: {
+      set (val) {
+        this.$emit('update:is-loading', val)
+      },
+      get () {
+        return this.isLoading
+      }
+    }
+  },
   created () {
     // 如果有用户id 根据id查询用户信息
     const id = this.$route.query.userId
@@ -146,6 +160,7 @@ export default {
     onSubmit () {
       this.$refs['userForm'].validate(async (valid) => {
         if (valid) {
+          this.loading = true
           let res = {}
           if (this.isEdit) {
             res = await userApi.editUserData(this.userForm)
@@ -158,6 +173,7 @@ export default {
           } else {
             this.$message.error('编撰失败！')
           }
+          this.loading = false
         }
       })
     }

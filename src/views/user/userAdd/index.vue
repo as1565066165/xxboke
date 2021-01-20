@@ -7,15 +7,15 @@
       </div>
       <el-tabs v-model="activeName" :tab-position="position" style="height:100%">
         <el-tab-pane label="基本信息" name="basePanel">
-          <base-panel ref="basePanel" :is-active="isActive" :is-edit="isEdit" />
+          <base-panel ref="basePanel" :is-active="isActive" :is-edit="isEdit" :is-loading.sync="loading" />
         </el-tab-pane>
         <el-tab-pane v-if="isEdit" label="密码修改" name="passwordPanel">
-          <password-panel ref="passwordPanel" :is-active="isActive" />
+          <password-panel ref="passwordPanel" :is-active="isActive" :is-loading.sync="loading" />
         </el-tab-pane>
       </el-tabs>
     </el-card>
     <el-card class="submit-button-box" shadow="hover">
-      <el-button type="primary" size="small" @click="onSubmit(activeName)">{{ isEdit?'立即修改':'立即创建' }}</el-button>
+      <el-button type="primary" size="small" :loading="loading" @click="onSubmit(activeName)">{{ isEdit?'立即修改':'立即创建' }}</el-button>
       <el-button size="small" @click="goBack">返回
       </el-button>
     </el-card>
@@ -32,9 +32,14 @@ export default {
   },
   data () {
     return {
+      // 是否激活class
       isActive: true,
+      // 当前选择的tab菜单
       activeName: 'basePanel',
-      position: 'right'
+      // tab菜单位置
+      position: 'right',
+      // 是否在加载
+      loading: false
     }
   },
   computed: {
