@@ -3,26 +3,26 @@
     <el-card class="user-list-card" shadow="hover">
       <div v-show="showSearchBox" class="user-search-box el-row">
         <div class="user-search-item el-col-6 el-col-xs-24 el-col-sm-24 el-col-md-6 el-col-lg-6 el-col-xl-6">用户：
-          <el-input v-model="searchForm.name" prefix-icon="el-icon-search" size="medium" placeholder="根据用户名称模糊查询" style="width:calc(100% - 70px)" />
+          <el-input v-model="searchForm.name" prefix-icon="el-icon-search" size="medium" placeholder="根据用户名称模糊查询" :style="isActive?'width:calc(100% - 54px)':'width:calc(100% - 70px)'" />
         </div>
         <div class="user-search-item el-col-6 el-col-xs-24 el-col-sm-24 el-col-md-6 el-col-lg-6 el-col-xl-6">角色：
-          <el-select v-model="searchForm.role" size="medium" placeholder="请选择" style="width:calc(100% - 70px);">
+          <el-select v-model="searchForm.role" size="medium" placeholder="请选择" :style="isActive?'width:calc(100% - 54px)':'width:calc(100% - 70px)'">
             <el-option v-for="item in userTypesList" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </div>
         <div class="user-search-item el-col-6 el-col-xs-24 el-col-sm-24 el-col-md-6 el-col-lg-6 el-col-xl-6">状态：
-          <el-select v-model="searchForm.status" size="medium" placeholder="请选择" style="width:calc(100% - 70px);">
+          <el-select v-model="searchForm.status" size="medium" placeholder="请选择" :style="isActive?'width:calc(100% - 54px)':'width:calc(100% - 70px)'">
             <el-option v-for="item in userStatusList" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </div>
         <div v-show="moreSearchCondition" class="user-search-item el-col-6 el-col-xs-24 el-col-sm-24 el-col-md-6 el-col-lg-6 el-col-xl-6">昵称：
-          <el-input v-model="searchForm.userName" prefix-icon="el-icon-search" size="medium" placeholder="根据用户昵称模糊查询" style="width:calc(100% - 70px)" />
+          <el-input v-model="searchForm.userName" prefix-icon="el-icon-search" size="medium" placeholder="根据用户昵称模糊查询" :style="isActive?'width:calc(100% - 54px)':'width:calc(100% - 70px)'" />
         </div>
         <div v-show="moreSearchCondition" class="user-search-item el-col-6 el-col-xs-24 el-col-sm-24 el-col-md-6 el-col-lg-6 el-col-xl-6">邮箱：
-          <el-input v-model="searchForm.email" prefix-icon="el-icon-search" size="medium" placeholder="根据用户邮箱模糊查询" style="width:calc(100% - 70px)" />
+          <el-input v-model="searchForm.email" prefix-icon="el-icon-search" size="medium" placeholder="根据用户邮箱模糊查询" :style="isActive?'width:calc(100% - 54px)':'width:calc(100% - 70px)'" />
         </div>
         <div v-show="moreSearchCondition" class="user-search-item el-col-12 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-12 el-col-xl-12">时间：
-          <el-date-picker v-model="searchForm.dateTime" type="datetimerange" style="width:calc(100% - 70px);height:36px" :picker-options="pickerOptions" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" align="right" />
+          <el-date-picker v-model="searchForm.dateTime" type="datetimerange" :style="isActive?'width:calc(100% - 54px);height:36px':'width:calc(100% - 70px);height:36px'" :picker-options="pickerOptions" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" align="right" />
         </div>
         <div class="el-col-6 el-col-xs-24 el-col-sm-24 el-col-md-6 el-col-lg-6 el-col-xl-6">
           <div class="search-button-box">
@@ -157,7 +157,9 @@ export default {
             picker.$emit('pick', [start, end])
           }
         }]
-      }
+      },
+      // 是否激活
+      isActive: false
     }
   },
   created () {
@@ -181,14 +183,16 @@ export default {
     },
     // 根据窗口大小获取分页配置
     getPaginationOptions () {
-      const flag = window.document.body.clientWidth < 750
+      const flag = window.document.body.clientWidth < 768
       if (flag) {
+        this.isActive = true
         this.dialogWidth = '80%'
         this.paginationLayout = 'total, prev,next, jumper'
         this.text1 = '上一页'
         this.text2 = '下一页'
         this.marginLeft = 'marginLeft:0px'
       } else {
+        this.isActive = false
         this.dialogWidth = '60%'
         this.paginationLayout = 'total, prev, pager, next, sizes, jumper'
         this.text1 = ''

@@ -3,15 +3,15 @@
     <el-card class="comment-list-card" shadow="hover">
       <div v-show="showSearchBox" class="comment-search-box el-row">
         <div class="comment-search-item el-col-6 el-col-xs-24 el-col-sm-24 el-col-md-6 el-col-lg-6 el-col-xl-6">内容：
-          <el-input v-model="searchForm.content" prefix-icon="el-icon-search" size="medium" placeholder="根据评论内容模糊查询" style="width:calc(100% - 70px)" />
+          <el-input v-model="searchForm.content" prefix-icon="el-icon-search" size="medium" placeholder="根据评论内容模糊查询" :style="isActive?'width:calc(100% - 54px)':'width:calc(100% - 70px)'" />
         </div>
         <div class="comment-search-item el-col-6 el-col-xs-24 el-col-sm-24 el-col-md-6 el-col-lg-6 el-col-xl-6">类型：
-          <el-select v-model="searchForm.type" size="medium" placeholder="请选择" style="width:calc(100% - 70px);">
+          <el-select v-model="searchForm.type" size="medium" placeholder="请选择" :style="isActive?'width:calc(100% - 54px)':'width:calc(100% - 70px)'">
             <el-option v-for="item in commentTypesList" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </div>
         <div class="comment-search-item el-col-6 el-col-xs-24 el-col-sm-24 el-col-md-6 el-col-lg-6 el-col-xl-6">状态：
-          <el-select v-model="searchForm.status" size="medium" placeholder="请选择" style="width:calc(100% - 70px);">
+          <el-select v-model="searchForm.status" size="medium" placeholder="请选择" :style="isActive?'width:calc(100% - 54px)':'width:calc(100% - 70px)'">
             <el-option v-for="item in commentStatusList" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </div>
@@ -113,7 +113,9 @@ export default {
       // 替代图标显示的下一页文字
       text2: '',
       // 按钮样式
-      marginLeft: ''
+      marginLeft: '',
+      // 是否激活
+      isActive: false
     }
   },
   created () {
@@ -137,14 +139,16 @@ export default {
     },
     // 根据窗口大小获取分页配置
     getPaginationOptions () {
-      const flag = window.document.body.clientWidth < 750
+      const flag = window.document.body.clientWidth < 768
       if (flag) {
+        this.isActive = true
         this.dialogWidth = '80%'
         this.paginationLayout = 'total, prev,next, jumper'
         this.text1 = '上一页'
         this.text2 = '下一页'
         this.marginLeft = 'marginLeft:0px'
       } else {
+        this.isActive = false
         this.dialogWidth = '60%'
         this.paginationLayout = 'total, prev, pager, next, sizes, jumper'
         this.text1 = ''

@@ -114,7 +114,7 @@ export default {
     },
     // 根据窗口大小获取分页配置
     getPaginationOptions () {
-      const flag = window.document.body.clientWidth < 750
+      const flag = window.document.body.clientWidth < 768
       if (flag) {
         this.paginationLayout = 'total, prev,next, jumper'
         this.text1 = '上一页'

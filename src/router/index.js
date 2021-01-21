@@ -119,6 +119,26 @@ export const constantRoutes = [
     }
     ]
   },
+  {
+    path: '/system',
+    component: Layout,
+    redirect: '/system/settings',
+    name: '/System',
+    meta: { title: '系统设置', icon: 'el-icon-setting' },
+    children: [{
+      path: 'settings',
+      name: 'Settings',
+      component: () => import('@/views/system/settings/index'),
+      meta: { title: '网站设置', icon: 'el-icon-setting' }
+    },
+    {
+      path: 'slides',
+      name: 'Slides',
+      component: () => import('@/views/system/slides/index'),
+      meta: { title: '图片轮播', icon: 'el-icon-picture-outline' }
+    }
+    ]
+  },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

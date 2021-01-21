@@ -5,12 +5,14 @@ const user = require('./user')
 const comment = require('./comment')
 const dashboard = require('./dashboard')
 const article = require('./article')
+const system = require('./system')
 
 const mocks = [
   ...user,
   ...comment,
   ...dashboard,
-  ...article
+  ...article,
+  ...system
 ]
 
 // for front mock
