@@ -1,8 +1,5 @@
 <template>
   <div>
-    <div v-if="!isCollapse" class="website-logo">
-      <img src="@/assets/website_image/logo.png" alt="" style="width:100%;padding:20px 20px 10px 20px;">
-    </div>
     <div :class="{'has-logo':showLogo}">
       <logo v-if="showLogo" :collapse="isCollapse" />
       <el-scrollbar wrap-class="scrollbar-wrapper">
