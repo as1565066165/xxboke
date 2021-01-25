@@ -136,6 +136,12 @@ export const constantRoutes = [
       name: 'Slides',
       component: () => import('@/views/system/slides/index'),
       meta: { title: '图片轮播', icon: 'el-icon-picture-outline' }
+    },
+    {
+      path: 'video',
+      name: 'Video',
+      component: () => import('@/views/system/video/index'),
+      meta: { title: '视频推送', icon: 'el-icon-video-camera' }
     }
     ]
   },

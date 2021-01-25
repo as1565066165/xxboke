@@ -41,7 +41,7 @@
               <img :src="row.imgUrl" alt="" style="maxHeight:80px;width:auto">
             </template>
           </el-table-column>
-          <el-table-column prop="title" label="名称" />
+          <el-table-column prop="title" label="标题" />
           <el-table-column prop="link" label="链接" width="200" />
           <el-table-column label="操作" fixed="right" width="100">
             <template v-slot="{row}">

@@ -16,6 +16,14 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+// 引入videojs样式
+require('video.js/dist/video-js.css')
+require('vue-video-player/src/custom-theme.css')
+// 全局挂载video组件
+import VueVideoPlayer from 'vue-video-player'
+import 'videojs-contrib-hls'
+Vue.use(VueVideoPlayer)
+
 import VueQuillEditor from 'vue-quill-editor'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'

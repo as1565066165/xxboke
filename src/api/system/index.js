@@ -37,6 +37,43 @@ const api = {
       method: 'put',
       params: data
     })
+  },
+  // 获取视频流列表
+  getVideoList () {
+    return request({
+      url: '/system/getVideoList',
+      method: 'get'
+    })
+  },
+  // 新增视频流数据
+  addVideoData (data) {
+    return request({
+      url: `/system/addVideoData`,
+      method: 'post',
+      data
+    })
+  },
+  // 删除视频流数据
+  deleteVideoData (id) {
+    if (Array.isArray(id)) {
+      return request({
+        url: `/system/deleteVideoData?videoId=${id.join(',')}`,
+        method: 'delete'
+      })
+    } else {
+      return request({
+        url: `/system/deleteVideoData?videoId=${id}`,
+        method: 'delete'
+      })
+    }
+  },
+  // 编辑视频流表格数据
+  editVideoData (data) {
+    return request({
+      url: `/system/editVideoData`,
+      method: 'put',
+      params: data
+    })
   }
 }
 export default api

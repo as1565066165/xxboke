@@ -155,8 +155,12 @@ export default {
     },
     // 当点击确认按钮触发事件
     submitHandle () {
-      this.$emit('getCurrentArticleData', this.currentRow)
-      this.dialogVisible = false
+      if (this.currentRow) {
+        this.$emit('getCurrentArticleData', this.currentRow)
+        this.dialogVisible = false
+      } else {
+        this.$message.error('请先选择表格数据！')
+      }
     },
     // 点击关闭图标或遮罩关闭 Dialog 时起效
     handleClose () {

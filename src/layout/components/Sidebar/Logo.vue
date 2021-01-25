@@ -8,7 +8,7 @@
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
         <div class="website-logo">
-          <img src="@/assets/website_image/logo.png" alt="" style="width:100%;padding:20px">
+          <img src="@/assets/website_image/logo.png" alt="" style="width:100%;padding:20px 20px 10px 20px">
         </div>
       </router-link>
     </transition>
